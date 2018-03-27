@@ -43,8 +43,8 @@ simulate_genos_and_pheno <- function(n_subjects, n_snps, af, af_mat, sigma_e, be
     for(i_subject in 1:n_subjects) {
         g <- quick_sim_geno_one_subject(n_snps, af_mat)
         g <- normalize_geno(g, af)
-        G[i_subject, G_first_geno] <- as.integer(g == 2)
-        G[i_subject, G_second_geno] <- as.integer(1 <= g)
+        G[i_subject, G_first_geno] <- as.integer(g == 2) + 1 ## 0 = missing, 1 = ref, 2 = alt
+        G[i_subject, G_second_geno] <- as.integer(1 <= g) + 1
         eps <- rnorm(n = 1, mean = 0, sd = sigma_e)        
         pheno[i_subject] <- sum(betas * g) + eps
     }
