@@ -1,0 +1,57 @@
+#!/usr/bin/env Rscript
+
+message("Begin make test dataset")
+
+## change directory to one up from scripts, no matter how this was called
+args <- commandArgs(trailingOnly = FALSE)
+for(key in c("--file=", "--f=")) {
+    i <- substr(args, 1, nchar(key)) == key
+    if (sum(i) == 1) {
+        script_dir <- dirname(substr(args[i], nchar(key) + 1, 1000))
+        setwd(file.path(script_dir, "../"))
+    }
+}
+
+source("R/functions.R")
+
+args <- commandArgs(trailingOnly = TRUE)
+out_prefix <- args[1]
+map_filename <- paste0(out_prefix, ".map")
+fam_filename <- paste0(out_prefix, ".fam")
+ped_filename <- paste0(out_prefix, ".ped")
+
+h2_g <- 0.5
+sigma <- 1 ## of linear phenotype
+n_subjects <- 1000
+
+n_chrs <- 10
+n_snps <- 10000 ## total number
+chrlist <- 1:n_chrs
+n_snps_per_chr <- round(n_snps * (seq(n_chrs, 1) / sum(seq(n_chrs, 1))))
+
+sigma_g <- sqrt(h2_g * sigma ** 2)
+sigma_e <- sqrt((1 - h2_g) * sigma ** 2)
+betas <- rnorm(n = n_snps, mean = 0, sd = sigma_g / sqrt(n_snps))
+af <- runif(n_snps, min = 0.05, max = 0.95)
+af_mat <- cbind((1 - af) ** 2, (1 - af) ** 2 + 2 * af * (1 - af), 1)
+
+message("Make .map")
+map <- make_map(n_chrs, chrlist)
+
+message("Make .fam")
+fam <- make_fam(n_subjects)
+
+message("Make genotypes and phenotype")
+out <- simulate_genos_and_pheno(n_subjects, n_snps, af, af_mat, sigma_e, betas) 
+G <- out$G
+pheno <- out$pheno
+
+if (0.1 < abs(var(pheno) - sigma))
+    stop("Faulty assumptions")
+
+message("Write to disk")
+write_to_disk(map, map_filename)
+write_to_disk(fam, fam_filename)
+write_to_disk(cbind(fam, G), ped_filename)
+
+message("Done make test dataset")
