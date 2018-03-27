@@ -3,6 +3,7 @@
 from optparse import OptionParser
 import subprocess
 import os
+import tempfile
 
 cur_dir= os.path.dirname(os.path.realpath(__file__))
 
@@ -29,11 +30,11 @@ def main():
 	help="What target to build"
     )
     parser.add_option(
-        "-b", "--bfile",
+        "-p", "--prefix",
 	action="store",
-	dest="bfile",
-	default="all",
-	help="Path to bfile prefix"
+	dest="prefix",
+	default="jimmy",
+	help="Path to plink prefix (e.g. test for test.ped and test.bed"
     )
     parser.add_option(
         "-j", "--jobs",
@@ -45,34 +46,39 @@ def main():
     )
     (options, args) = parser.parse_args()
 
-    print(
-            " ".join([
-                SNAKEMAKE,
-                '--snakefile', SNAKEFILE,
-                '--jobs', str(options.jobs),
-                options.target
-            ])
-    )
+    with tempfile.NamedTemporaryFile(mode='w') as temp:
 
+        temp.write("prefix = '" + options.prefix + "'\n")
+        temp.flush()
+
+        command= [
+            'cat', SNAKEFILE, '>>', str(temp.name)
+        ]
+        subprocess.check_output(" ".join(command), shell = True)
+        local_snakefile = temp.name
+        
+
+        print(subprocess.check_output(" ".join(["cp", local_snakefile, "temp.Snakefile"]), shell = True)        )
     
-    ## todo, do this entirely within Python?
-    if options.environment == "cluster":
-        subprocess.check_output(
-            [
+        ## todo, do this entirely within Python?
+        if options.environment == "cluster":
+            command = [
                 SNAKEMAKE,
-                '--snakefile', SNAKEFILE,
+                '--snakefile', local_snakefile,
                 options.target
             ]
-        )
-    elif options.environment == "local":
-        subprocess.check_output(
-            [
+        elif options.environment == "local":
+            command = [
                 SNAKEMAKE,
-                '--snakefile', SNAKEFILE,
+                '--snakefile', local_snakefile,
                 '--jobs', str(options.jobs),
                 options.target
             ]
-        )
-        
+
+        print(" ".join(command))
+        subprocess.check_output(command)
+
+
+
 if __name__ == '__main__':
     main()
