@@ -91,8 +91,7 @@ def main():
         subprocess.check_output(" ".join(command), shell = True)
         local_snakefile = temp.name
         
-
-        print(subprocess.check_output(" ".join(["cp", local_snakefile, "temp.Snakefile"]), shell = True)        )
+        subprocess.check_output(" ".join(["cp", local_snakefile, "temp.Snakefile"]), shell = True)
     
         ## todo, do this entirely within Python?
         if options.unlock:
@@ -115,7 +114,7 @@ def main():
                 options.target
             ]
 
-        print(" ".join(command))
+        ## print(" ".join(command))
         subprocess.check_output(command)
 
 

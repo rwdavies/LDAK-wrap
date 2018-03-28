@@ -19,6 +19,7 @@ out_prefix <- args[1]
 map_filename <- paste0(out_prefix, ".map")
 fam_filename <- paste0(out_prefix, ".fam")
 ped_filename <- paste0(out_prefix, ".ped")
+pheno_filename <- paste0(out_prefix, ".pheno")
 
 h2_g <- 0.5
 sigma <- 1 ## of linear phenotype
@@ -53,5 +54,6 @@ message("Write to disk")
 write_to_disk(map, map_filename)
 write_to_disk(fam, fam_filename)
 write_to_disk(cbind(fam, G), ped_filename)
+write_to_disk(cbind(fam[, 1:2], pheno), pheno_filename)
 
 message("Done make test dataset")
