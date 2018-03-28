@@ -4,13 +4,25 @@ from optparse import OptionParser
 import subprocess
 import os
 import tempfile
+import sys
 
 cur_dir= os.path.dirname(os.path.realpath(__file__))
 
 SNAKEMAKE = cur_dir + "/snakemake/.venv/bin/snakemake"
 SNAKEFILE = cur_dir + "/Snakefile"
 check_dependencies = cur_dir + "/scripts/check-dependencies.sh"
-LDAK = cur_dir + "/ldak5.linux"
+
+if platform == "linux" or platform == "linux2":
+    LDAK = cur_dir + "/ldak5.linux"
+elif platform == "darwin":
+    LDAK = cur_dir + "/ldak5.mac"
+else:
+    sys.exit("LDAK-wrap is only supported for mac and linux")
+
+
+
+    
+
 
 def main():
     parser = OptionParser(
