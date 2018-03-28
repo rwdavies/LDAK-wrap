@@ -11,5 +11,5 @@ In progress. Not (yet) for general use
 ./scripts/make-test-dataset.sh
 
 # run on test dataset
-./LDAK-wrap.sh
+./LDAK-wrap.py -p test-results/testdata
 ```
