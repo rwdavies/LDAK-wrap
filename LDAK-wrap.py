@@ -65,6 +65,12 @@ def main():
 	default=1,
 	help="Number of jobs to allow"
     )
+    parser.add_option(
+        "-u", "--unlock",
+	action="store_true",
+        default=False,
+	help="Whether to unlock snakemake"
+    )
     (options, args) = parser.parse_args()
 
     command= [
@@ -72,7 +78,6 @@ def main():
     ]
     subprocess.check_output(" ".join(command), shell = True)
 
-    
     with tempfile.NamedTemporaryFile(mode='w') as temp:
 
         temp.write("LDAK = '" + LDAK + "'\n")        
@@ -90,7 +95,13 @@ def main():
         print(subprocess.check_output(" ".join(["cp", local_snakefile, "temp.Snakefile"]), shell = True)        )
     
         ## todo, do this entirely within Python?
-        if options.environment == "cluster":
+        if options.unlock:
+            command = [
+                SNAKEMAKE,
+                '--snakefile', local_snakefile,
+                "--unlock"
+            ]
+        elif options.environment == "cluster":
             command = [
                 SNAKEMAKE,
                 '--snakefile', local_snakefile,

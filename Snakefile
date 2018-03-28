@@ -48,22 +48,23 @@ rule get_sections_by_chr:
 ## need to be clever
 rule prepare_to_make_weights_by_chr:
     input:
-        workingdir + "/sections/chr{chr}/section.details"
+        workingdir + "/sections/chr{chr}/section.number"
     output:
-        dynamic(workingdir + "/sections/chr{chr}/section.details.to_run{weights}")
+        dynamic(workingdir + "/sections/chr{chr}/to_run{weight}")
     shell:
-        'n_sections=$(cat {input}) && '
+        'echo hello && '
+        'n_sections=`cat {input}` && '
         'echo ${{n_sections}} && '
-        'for i in $(seq 1 n_sections); '
-        'do touch {input}.to_run${{i}}; '
+        'for weight in $(seq 1 ${{n_sections}}); '
+        'do touch {input}.to_run${{weight}}; '
         'done'
 
 rule make_weights_by_chr:
     input:
         bed = prefix + ".chr{chr}.bed",
-        inputs = workingdir + "/sections/chr{chr}/section.details.to_run{weights}"
+        inputs = workingdir + "/sections/chr{chr}/to_run{weight}"
     output:
-        workingdir + "/sections/chr{chr}/section.details.to_see{weights}"
+        workingdir + "/sections/chr{chr}/to_see{weight}"
     shell:
         '{LDAK} --bfile {input.bed} '
         '--calc-weights workingdir + "/sections/chr{chr} '
@@ -71,7 +72,7 @@ rule make_weights_by_chr:
 
 rule join_weights_by_chr:
     input:
-        dynamic(workingdir + "/sections/chr{chr}/section.details.to_see{weights}")
+        dynamic(workingdir + "/sections/chr{chr}/section.details.to_see{weight}")
     output:
         workingdir + "/sections/chr{chr}/weights.all"
     shell:
