@@ -50,7 +50,7 @@ simulate_genos <- function(n_subjects, n_snps, af, af_mat, alpha) {
     G_ped <- array(NA, c(n_subjects, 2 * n_snps)) ## order as in PLINK file
     pheno <- array(NA, n_subjects)
     G_first_geno <- seq(1, 2 * n_snps, 1)
-    G_second_geno <- seq(1, 2 * n_snps, 1)
+    G_second_geno <- seq(1, 2 * n_snps, 2)
     for(i_subject in 1:n_subjects) {
         g <- quick_sim_geno_one_subject(n_snps, af_mat)
         ##g_norm <- normalize_geno(g, af, alpha)
@@ -66,7 +66,7 @@ simulate_genos <- function(n_subjects, n_snps, af, af_mat, alpha) {
     )
 }
 
-simulate_betas <- function(map, n_snps, chrlist, f, sigma_g) {
+simulate_betas <- function(map, n_snps, chrlist, f, sigma_g, model) {
     betas <- array(NA, n_snps)
     W <- sum( (2 * f * (1 - f)) ** (1 + alpha))
     betas <- rnorm(n = n_snps, mean = 0, sd = sigma_g / sqrt(W))

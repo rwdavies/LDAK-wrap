@@ -8,4 +8,7 @@ TEST_RESULTS="`pwd`"/test-results
 mkdir -p ${TEST_RESULTS}
 TEST_PREFIX=${TEST_RESULTS}/testdata
 
-R --slave -f R/make-test-dataset.R --args ${TEST_PREFIX}
+ALPHA=${1:-"-0.25"}
+
+echo Simulating assuming alpha=${ALPHA}
+R --slave -f R/make-test-dataset.R --args ${TEST_PREFIX} ${ALPHA}

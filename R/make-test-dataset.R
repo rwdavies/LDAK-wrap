@@ -16,12 +16,12 @@ source("R/functions.R")
 
 args <- commandArgs(trailingOnly = TRUE)
 out_prefix <- args[1]
+alpha <- as.numeric(args[2]) ## -0.25 = LDAK, -1 = GCTA
 map_filename <- paste0(out_prefix, ".map")
 fam_filename <- paste0(out_prefix, ".fam")
 ped_filename <- paste0(out_prefix, ".ped")
 pheno_filename <- paste0(out_prefix, ".pheno")
 
-alpha <- -0.25
 h2_g <- 0.5
 sigma <- 1 ## of linear phenotype
 n_subjects <- 1000
@@ -47,10 +47,11 @@ out <- simulate_genos(n_subjects, n_snps, af, af_mat, alpha)
 G <- out$G
 G_ped <- out$G_ped
 f <- colSums(G) / n_subjects / 2
-X <- normalize_genotype_matrix(G, f, alpha)
+X <- normalize_genotype_matrix(G, f, alpha) ## use observed frequency
 
 message("Make phenotypes")
-betas <- simulate_betas(map, n_snps, chrlist, f, sigma_g)
+betas <- simulate_betas(map, n_snps, chrlist, af, sigma_g) ## use underlying frequency
+
 pheno <- X %*% betas + rnorm(n = n_subjects, mean = 0, sd = sigma_e)
 
 if (0.1 < abs(var(pheno) - sigma ** 2)) {
