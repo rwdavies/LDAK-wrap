@@ -10,7 +10,7 @@ chromosomes = list(range(1, 11)) # 1-10, 1-based
 ## -0.25 is recommended in general
 ## or to be the same as GCTA set to -1
 ## this should take some time
-LDAK_POWER = -0.25 
+LDAK_POWER = -0.25
 
 
 rule all:
@@ -125,10 +125,14 @@ rule calculate_kinships:
     output:
         workingdir + "/partitions/kinships.{chr}.grm.bin"
     shell:
-        '{LDAK} --bfile {prefix} --calc-kins {workingdir}/partitions '
+        '{LDAK} --bfile {prefix} '
+        '--calc-kins {workingdir}/partitions '
         '--partition {wildcards.chr} '
         '--weights {workingdir}/sections/weights.all '
         '--power {LDAK_POWER}'
+
+## to ignore weights
+##  --ignore-weights YES
 
 ## step2C join kinships
 rule join_kinships:
