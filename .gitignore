@@ -1,2 +1,11 @@
 *.Rhistory
 *~
+plink*
+ldak*
+test-results
+virtualenv-15.1.0
+v4.8.0.tar.gz
+15.1.0.tar.gz
+.snakemake
+.DS_Store
+#*
