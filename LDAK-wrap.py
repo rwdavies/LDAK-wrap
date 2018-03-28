@@ -9,6 +9,8 @@ cur_dir= os.path.dirname(os.path.realpath(__file__))
 
 SNAKEMAKE = cur_dir + "/snakemake/.venv/bin/snakemake"
 SNAKEFILE = cur_dir + "/Snakefile"
+check_dependencies = cur_dir + "/scripts/check-dependencies.sh"
+LDAK = cur_dir + "/ldak5.linux"
 
 def main():
     parser = OptionParser(
@@ -37,6 +39,13 @@ def main():
 	help="Path to plink prefix (e.g. test for test.ped and test.bed"
     )
     parser.add_option(
+        "-w", "--workingdir",
+	action="store",
+	dest="workingdir",
+	default="LDAKoutput",
+	help="Path for where results go"
+    )
+    parser.add_option(
         "-j", "--jobs",
 	action="store",
 	dest="jobs",
@@ -46,9 +55,17 @@ def main():
     )
     (options, args) = parser.parse_args()
 
+    command= [
+        'bash', check_dependencies
+    ]
+    subprocess.check_output(" ".join(command), shell = True)
+
+    
     with tempfile.NamedTemporaryFile(mode='w') as temp:
 
+        temp.write("LDAK = '" + LDAK + "'\n")        
         temp.write("prefix = '" + options.prefix + "'\n")
+        temp.write("workingdir = '" + options.workingdir + "'\n")        
         temp.flush()
 
         command= [

@@ -4,8 +4,8 @@ LDAK-wrap Wrapper around LDAK using Snakemake
 In progress. Not (yet) for general use
 
 ```
-# install
-./scripts/install-snakemake.sh
+# install Snakemake and LDAK
+./scripts/install.sh
 
 # make test dataset
 ./scripts/make-test-dataset.sh
