@@ -12,6 +12,7 @@ SNAKEMAKE = cur_dir + "/snakemake/.venv/bin/snakemake"
 SNAKEFILE = cur_dir + "/Snakefile"
 check_dependencies = cur_dir + "/scripts/check-dependencies.sh"
 
+from sys import platform
 if platform == "linux" or platform == "linux2":
     LDAK = cur_dir + "/ldak5.linux"
 elif platform == "darwin":
