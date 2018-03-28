@@ -6,7 +6,10 @@ import os
 import tempfile
 import sys
 
-cur_dir= os.path.dirname(os.path.realpath(__file__))
+cur_dir = os.path.dirname(os.path.realpath(__file__))
+## get current directory, so get plink if installed locally
+my_env = os.environ.copy()
+my_env["PATH"] = cur_dir + "/:" + my_env["PATH"]
 
 SNAKEMAKE = cur_dir + "/snakemake/.venv/bin/snakemake"
 SNAKEFILE = cur_dir + "/Snakefile"
@@ -19,8 +22,6 @@ elif platform == "darwin":
     LDAK = cur_dir + "/ldak5.mac"
 else:
     sys.exit("LDAK-wrap is only supported for mac and linux")
-
-
 
     
 
@@ -116,7 +117,7 @@ def main():
             ]
 
         ## print(" ".join(command))
-        subprocess.check_output(command)
+        subprocess.check_output(command, env=my_env)
 
 
 
