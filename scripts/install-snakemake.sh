@@ -12,11 +12,18 @@ fi
 
 export PATH=`pwd`/virtualenv-15.1.0/:${PATH}
 
-rm -r -f snakemake
-${WGET_OR_CURL} https://bitbucket.org/snakemake/snakemake/get/v4.8.0.tar.gz
-tar -xzvf v4.8.0.tar.gz
-mv snakemake-snakemake-e0c4734235c5 snakemake
-cd snakemake
-virtualenv.py -p python3 .venv
-source .venv/bin/activate
-python setup.py install
+export SNAKEMAKE=`pwd`/snakemake/.venv/bin/snakemake
+if [ ! -e virtualenv-15.1.0/virtualenv.py ]
+then
+    echo install snakemake
+    echo remove existing snakemake
+    rm -r -f snakemake
+    echo download
+    ${WGET_OR_CURL} https://bitbucket.org/snakemake/snakemake/get/v4.8.0.tar.gz
+    tar -xzvf v4.8.0.tar.gz
+    mv snakemake-snakemake-e0c4734235c5 snakemake
+    cd snakemake
+    virtualenv.py -p python3 .venv
+    source .venv/bin/activate
+    python setup.py install
+fi
