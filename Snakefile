@@ -28,6 +28,7 @@ rule step1:
 #expand(prefix + ".chr{chr}.bed", chr = chromosomes)
 
 rule make_bed:
+    params: N = "make_bed"
     input:
         ped = prefix + ".ped"
     output:
@@ -37,6 +38,7 @@ rule make_bed:
 
 
 rule split_by_chr:
+    params: N = "split_by_chr"
     input:
         bed = prefix + ".bed"
     output:
@@ -47,6 +49,7 @@ rule split_by_chr:
 
 ## step 1A
 rule get_sections_by_chr:
+    params: N = "get_sections_by_chr"
     input:
         bed = prefix + ".chr{chr}.bed"
     output:
@@ -59,6 +62,7 @@ rule get_sections_by_chr:
 ## step 1B, part 1. since LDAK makes intedeterminate number of files, need to be clever
 ## so make dummy files, 1 per region to run over
 rule prepare_to_make_weights_by_chr:
+    params: N = "prepare_to_make_weights_by_chr"
     input:
         workingdir + "/sections/chr{chr}/section.number"
     output:
@@ -73,6 +77,7 @@ rule prepare_to_make_weights_by_chr:
 
 ## step 1B - make weights per chromosome region
 rule make_weights_by_chr:
+    params: N = "make_weights_by_chr"
     input:
         bed = prefix + ".chr{chr}.bed",
         inputs = workingdir + "/sections/chr{chr}/to_run{weight}"
@@ -85,6 +90,7 @@ rule make_weights_by_chr:
 
 ## step1C - merge weights within chromosome together
 rule join_weights_by_chr:
+    params: N = "join_weights_by_chr"
     input:
         dynamic(workingdir + "/sections/chr{chr}/weights.{weight}.done"),
         prefix + ".chr{chr}.bed"
@@ -96,6 +102,7 @@ rule join_weights_by_chr:
 
 ## step1D - merge weights per chromosome together
 rule join_weights:
+    params: N = "join_weights"
     input:
         expand("{w}/sections/chr{chr}/weights.all", w = workingdir, chr = chromosomes)
     output:
@@ -109,6 +116,7 @@ rule join_weights:
 
 ## stpe2A prepare kinship calculations
 rule make_partitions:
+    params: N = "make_partitions"
     input:
         bed = prefix + ".bed"        
     output:
@@ -118,6 +126,7 @@ rule make_partitions:
 
 ## step2B calculate kinships
 rule calculate_kinships:
+    params: N = "calculate_kinships"
     input:
         prefix + ".bed",
         workingdir + "/partitions/partition.details",
@@ -136,6 +145,7 @@ rule calculate_kinships:
 
 ## step2C join kinships
 rule join_kinships:
+    params: N = "join_kinships"
     input:
         expand("{w}/partitions/kinships.{chr}.grm.bin", w = workingdir, chr = chromosomes)
     output:
@@ -145,6 +155,7 @@ rule join_kinships:
 
 ## step3 estimate h2
 rule estimate_h2:
+    params: N = "estimate_h2"
     input:
         phenofile = prefix + ".pheno",
         grm = workingdir + "/partitions/kinships.all.grm.bin"	
