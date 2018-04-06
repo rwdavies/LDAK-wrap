@@ -13,7 +13,7 @@ fi
 export PATH=`pwd`/virtualenv-15.1.0/:${PATH}
 
 export SNAKEMAKE=`pwd`/snakemake/.venv/bin/snakemake
-if [ ! -e virtualenv-15.1.0/virtualenv.py ]
+if [ ! -e ${SNAKEMAKE} ]
 then
     echo install snakemake
     echo remove existing snakemake
