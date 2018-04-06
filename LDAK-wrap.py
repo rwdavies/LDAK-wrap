@@ -151,7 +151,7 @@ def main():
             ]
 
             
-        print(" ".join(command))
+        ##print(" ".join(command))
         subprocess.check_output(command, env=my_env)
 
 
