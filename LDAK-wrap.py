@@ -7,6 +7,7 @@ import tempfile
 import sys
 
 cur_dir = os.path.dirname(os.path.realpath(__file__))
+
 ## get current directory, so get plink if installed locally
 my_env = os.environ.copy()
 my_env["PATH"] = cur_dir + "/:" + my_env["PATH"]
@@ -60,6 +61,13 @@ def main():
 	help="Path for where results go"
     )
     parser.add_option(
+        "-l", "--logdir",
+	action="store",
+	dest="logdir",
+	default="logs",
+	help="Path for where cluster logs go go"
+    )
+    parser.add_option(
         "-j", "--jobs",
 	action="store",
 	dest="jobs",
@@ -73,6 +81,13 @@ def main():
         default=False,
 	help="Whether to unlock snakemake"
     )
+    parser.add_option(
+        "-c", "--cluster-config",
+	action="store",
+        dest="cluster_config",
+        default=None,
+	help="Cluster configuration file"
+    )
     (options, args) = parser.parse_args()
 
     command= [
@@ -80,7 +95,17 @@ def main():
     ]
     subprocess.check_output(" ".join(command), shell = True)
 
-    with tempfile.NamedTemporaryFile(mode='w') as temp:
+    if not os.path.exists(options.workingdir):
+        os.makedirs(options.workingdir)
+    if not os.path.exists(options.logdir):
+        os.makedirs(options.logdir)
+
+    if not os.path.isabs(options.workingdir):
+        options.workingdir = os.path.join(cur_dir, options.workingdir)
+    if not os.path.isabs(options.logdir):
+        options.logdir = os.path.join(cur_dir, options.logdir)
+
+    with tempfile.NamedTemporaryFile(mode='w', dir = cur_dir) as temp:
 
         temp.write("LDAK = '" + LDAK + "'\n")        
         temp.write("prefix = '" + options.prefix + "'\n")
@@ -94,7 +119,7 @@ def main():
         local_snakefile = temp.name
         
         subprocess.check_output(" ".join(["cp", local_snakefile, "temp.Snakefile"]), shell = True)
-    
+
         ## todo, do this entirely within Python?
         if options.unlock:
             command = [
@@ -103,9 +128,18 @@ def main():
                 "--unlock"
             ]
         elif options.environment == "cluster":
+            ## for moab / torque
+            cluster_options = "".join([
+                "qsub -l vmem={cluster.vmem},walltime={cluster.walltime} -N {params.N}  -d ",
+                options.workingdir, " -V -m n -j eo -o ", options.logdir,
+                " -e ", options.logdir
+            ])
             command = [
                 SNAKEMAKE,
                 '--snakefile', local_snakefile,
+                '--cluster-config', options.cluster_config,                
+                '--cluster', cluster_options,
+                '--jobs', str(options.jobs),
                 options.target
             ]
         elif options.environment == "local":
@@ -116,7 +150,8 @@ def main():
                 options.target
             ]
 
-        ## print(" ".join(command))
+            
+        print(" ".join(command))
         subprocess.check_output(command, env=my_env)
 
 
