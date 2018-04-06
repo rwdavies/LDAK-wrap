@@ -1,0 +1,16 @@
+{
+    "__default__" :
+    {
+        "threads"   : 1,
+        "vmem"      : "2g",
+        "walltime"  : "2:00:00"
+    },
+    "split_by_ch" :
+    {
+        "threads"   : 1,
+        "vmem"      : "2g",
+        "walltime"  : "2:00:00"
+    }
+    
+
+}
