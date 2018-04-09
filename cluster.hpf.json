@@ -2,13 +2,13 @@
     "__default__" :
     {
         "threads"   : 1,
-        "vmem"      : "2g",
+        "vmem"      : "16g",
         "walltime"  : "2:00:00"
     },
-    "split_by_ch" :
+    "split_by_chr" :
     {
         "threads"   : 1,
-        "vmem"      : "2g",
+        "vmem"      : "16g",
         "walltime"  : "2:00:00"
     }
     

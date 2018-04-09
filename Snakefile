@@ -3,8 +3,9 @@
 ## LDAK = path to LDAK
 ## prefix = prefix to .ped or .bed
 ## workdir = where to work
+## chromosomes_string = chromosomes in string form
 
-chromosomes = list(range(1, 11)) # 1-10, 1-based
+chromosomes = [int(x) for x in chromosomes_string.split(",")]
 
 ## “power” is exponent to scale minor allele frequency by
 ## -0.25 is recommended in general

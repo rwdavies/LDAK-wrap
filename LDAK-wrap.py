@@ -82,12 +82,27 @@ def main():
 	help="Whether to unlock snakemake"
     )
     parser.add_option(
+        "-d", "--dryrun",
+	action="store_true",
+        default=False,
+	help="Whether to run Snakemake dryrun"
+    )
+    parser.add_option(
         "-c", "--cluster-config",
 	action="store",
         dest="cluster_config",
         default=None,
 	help="Cluster configuration file"
     )
+    ## could deprecate? figure out?
+    parser.add_option(
+        "--chromosomes",
+	action="store",
+        dest="chromosomes_string",
+        default="1,2,3,4,5,6,7,8,9,10",
+	help="Comma separated list of chromosomes to run over"
+    )
+
     (options, args) = parser.parse_args()
 
     command= [
@@ -109,7 +124,8 @@ def main():
 
         temp.write("LDAK = '" + LDAK + "'\n")        
         temp.write("prefix = '" + options.prefix + "'\n")
-        temp.write("workingdir = '" + options.workingdir + "'\n")        
+        temp.write("workingdir = '" + options.workingdir + "'\n")
+        temp.write("chromosomes_string = '" + options.chromosomes_string + "'\n")
         temp.flush()
 
         command= [
@@ -121,11 +137,22 @@ def main():
         subprocess.check_output(" ".join(["cp", local_snakefile, "temp.Snakefile"]), shell = True)
 
         ## todo, do this entirely within Python?
+
+        if options.unlock & options.dryrun:
+            sys.exit('Please select one of unlock or dryrun')
+            
         if options.unlock:
             command = [
                 SNAKEMAKE,
                 '--snakefile', local_snakefile,
                 "--unlock"
+            ]
+        elif options.dryrun:
+            command = [
+                SNAKEMAKE,
+                '--snakefile', local_snakefile,
+                "--dryrun",
+                options.target
             ]
         elif options.environment == "cluster":
             ## for moab / torque
@@ -150,11 +177,11 @@ def main():
                 options.target
             ]
 
-            
-        ##print(" ".join(command))
-        subprocess.check_output(command, env=my_env)
-
-
+        try:
+            print(subprocess.check_output(command, env=my_env).decode("utf-8"))
+        except subprocess.CalledProcessError as e:
+            print(e.output.decode('utf-8'))
+        print("Done LDAK-wrap")
 
 if __name__ == '__main__':
     main()
