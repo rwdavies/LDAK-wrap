@@ -1,7 +1,12 @@
-make_map <- function(n_chrs, chrlist) {
+make_map <- function(n_chrs, chrlist, make_rsid) {
+    if (make_rsid) {
+        var_id <- paste0("rs", 1:n_snps)
+    } else {
+        var_id <- rep(".", n_snps)
+    }
     map <- cbind(
         chr = unlist(sapply(1:n_chrs, function(i_chr) return(rep(chrlist[i_chr], n_snps_per_chr[i_chr])))),
-        var_id = paste0("rs", 1:n_snps),
+        var_id = var_id,
         map = rep(0, n_snps),
         pos = unlist(sapply(1:n_chrs, function(i_chr) return(1:n_snps_per_chr[i_chr])))
     )

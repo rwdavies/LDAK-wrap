@@ -17,6 +17,8 @@ source("R/functions.R")
 args <- commandArgs(trailingOnly = TRUE)
 out_prefix <- args[1]
 alpha <- as.numeric(args[2]) ## -0.25 = LDAK, -1 = GCTA
+make_rsid <- as.logical(args[3])
+
 map_filename <- paste0(out_prefix, ".map")
 fam_filename <- paste0(out_prefix, ".fam")
 ped_filename <- paste0(out_prefix, ".ped")
@@ -37,7 +39,7 @@ af <- runif(n_snps, min = 0.05, max = 0.95)
 af_mat <- cbind((1 - af) ** 2, (1 - af) ** 2 + 2 * af * (1 - af), 1)
 
 message("Make .map")
-map <- make_map(n_chrs, chrlist)
+map <- make_map(n_chrs, chrlist, make_rsid)
 
 message("Make .fam")
 fam <- make_fam(n_subjects)
