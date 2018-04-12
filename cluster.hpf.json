@@ -8,8 +8,14 @@
     "split_by_chr" :
     {
         "threads"   : 1,
-        "vmem"      : "16g",
+        "vmem"      : "48g",
         "walltime"  : "2:00:00"
+    },
+    "make_weights_by_chr" :
+    {
+        "threads"   : 1,
+        "vmem"      : "16g",
+        "walltime"  : "8:00:00"
     }
     
 
