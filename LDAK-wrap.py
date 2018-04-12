@@ -14,6 +14,7 @@ my_env["PATH"] = cur_dir + "/:" + my_env["PATH"]
 
 SNAKEMAKE = cur_dir + "/snakemake/.venv/bin/snakemake"
 SNAKEFILE = cur_dir + "/Snakefile"
+R_DIR = cur_dir + "/R/"
 check_dependencies = cur_dir + "/scripts/check-dependencies.sh"
 
 from sys import platform
@@ -76,6 +77,15 @@ def main():
 	help="Number of jobs to allow"
     )
     parser.add_option(
+        "--latency-wait",
+	action="store",
+	dest="latency_wait",
+        type=int,
+	default=60,
+	help="Filesystem latency, or How long to wait for files to appear"
+    )
+    
+    parser.add_option(
         "-u", "--unlock",
 	action="store_true",
         default=False,
@@ -126,6 +136,7 @@ def main():
         temp.write("prefix = '" + options.prefix + "'\n")
         temp.write("workingdir = '" + options.workingdir + "'\n")
         temp.write("chromosomes_string = '" + options.chromosomes_string + "'\n")
+        temp.write("R_DIR = '" + R_DIR + "'\n")
         temp.flush()
 
         command= [
@@ -164,6 +175,7 @@ def main():
             command = [
                 SNAKEMAKE,
                 '--snakefile', local_snakefile,
+                '--latency-wait', str(options.latency_wait),
                 '--cluster-config', options.cluster_config,                
                 '--cluster', cluster_options,
                 '--jobs', str(options.jobs),
