@@ -4,6 +4,7 @@
 ## prefix = prefix to .ped or .bed
 ## workdir = where to work
 ## chromosomes_string = chromosomes in string form
+## R_DIR = path to R scripts in R directory
 
 chromosomes = [int(x) for x in chromosomes_string.split(",")]
 
@@ -16,7 +17,7 @@ LDAK_POWER = -0.25
 
 rule all:
     input:
-        workingdir + "/result/pheno1.coeff"
+        [workingdir + "/result/pheno1.coeff", workingdir + "/partitions/kinships.all.vect.png"]
 
 rule step2:
     input:
@@ -45,7 +46,7 @@ rule split_by_chr:
     output:
         bed = prefix + ".chr{chr}.bed"
     shell:
-        'plink --file {prefix} --chr {wildcards.chr} --out {prefix}.chr{wildcards.chr} --make-bed'
+        'plink --bfile {prefix} --chr {wildcards.chr} --out {prefix}.chr{wildcards.chr} --make-bed'
 
 
 ## step 1A
@@ -153,6 +154,31 @@ rule join_kinships:
         workingdir + "/partitions/kinships.all.grm.bin"
     shell:
         '{LDAK} --bfile {prefix} --join-kins {workingdir}/partitions '
+
+## Optional: this is to produce PCs
+rule run_pca:
+    params: N = "run_pca"
+    input:
+        workingdir + "/partitions/kinships.all.grm.bin"
+    output:
+        workingdir + "/partitions/kinships.all.vect"
+    shell:
+        '{LDAK} '
+        '--grm {workingdir}/partitions/kinships.all '
+        '--pca {workingdir}/partitions/kinships.all '	
+        '--axes 20'
+
+rule plot_pca:
+    params: N = "run_pca"
+    input:
+        workingdir + "/partitions/kinships.all.vect"
+    output:
+        workingdir + "/partitions/kinships.all.vect.png"
+    shell:
+        '{R_DIR}/plot-pca.R --slave --args '
+        '{input} '
+        '{output} '
+
 
 ## step3 estimate h2
 rule estimate_h2:
