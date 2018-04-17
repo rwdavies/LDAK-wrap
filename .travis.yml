@@ -4,3 +4,7 @@ python:
 
 script:
   - ./scripts/all-tests.sh
+
+os:
+  - linux
+  - osx
