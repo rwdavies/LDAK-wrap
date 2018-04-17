@@ -17,7 +17,11 @@ LDAK_POWER = -0.25
 
 rule all:
     input:
-        [workingdir + "/result/pheno1.coeff", workingdir + "/partitions/kinships.all.vect.png"]
+        [
+        workingdir + "/result/pheno1.coeff",
+        workingdir + "/partitions/kinships.all.vect.png",
+        workingdir + "/partitions/pca.loads.load"	
+	]
 
 rule step2:
     input:
@@ -178,6 +182,35 @@ rule plot_pca:
         '{R_DIR}/plot-pca.R --slave --args '
         '{input} '
         '{output} '
+
+## Optional: generate loadings
+rule calc_pca_loads:
+    params: N = "calc_pca_loads"
+    input:
+        workingdir + "/partitions/kinships.all.grm.bin",
+        prefix + ".bed"
+    output:
+        workingdir + "/partitions/pca.loads.load"
+    shell:
+        '{LDAK} '
+        '--grm {workingdir}/partitions/kinships.all '
+        '--bfile {prefix} '
+        '--pcastem {workingdir}/partitions/kinships.all '
+        '--calc-pca-loads {workingdir}/partitions/pca.loads '
+
+## Optional: generate loadings
+## rule plot_pca_loads:
+##     params: N = "plot_pca_loads"
+##     input:
+##         workingdir + "/partitions/pca.loads.load"
+##     output:
+##         workingdir + "/partitions/pca.loads.load.temp"
+##     shell:
+##         '{LDAK} '
+##         '--grm {workingdir}/partitions/kinships.all '
+##         '--bfile {prefix} '
+##         '--pcastem {workingdir}/partitions/kinships.all '
+##         '--calc-pca-loads {workingdir}/partitions/pca.loads '
 
 
 ## step3 estimate h2
