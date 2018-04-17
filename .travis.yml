@@ -7,4 +7,7 @@ script:
 
 os:
   - linux
-  - osx
+#  - osx
+
+before_install:
+ - sudo apt-get install r-base
