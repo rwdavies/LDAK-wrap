@@ -1,6 +1,8 @@
 LDAK-wrap Wrapper around LDAK using Snakemake
 =============================================
 
+[![Build Status](https://travis-ci.org/rwdavies/LDAK-wrap.svg)](https://travis-ci.org/rwdavies/LDAK-wrap)
+
 In progress. Not (yet) for general use
 
 ```
