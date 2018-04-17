@@ -8,5 +8,6 @@ script_dir=`dirname "$0"`
 cd "${script_dir}/../"
 
 ./scripts/install.sh
+./scripts/make-test-dataset.sh
 
 exit 0

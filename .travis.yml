@@ -3,11 +3,14 @@ python:
   - "3.5"
 
 script:
-  - ./scripts/all-tests.sh
+  - echo hello
 
 os:
   - linux
 #  - osx
 
 before_install:
- - sudo apt-get install r-base
+ - sudo apt-get install r-base && R -h
+
+install:
+ - ./scripts/install.sh

@@ -13,7 +13,7 @@ else
     export WGET_OR_CURL="wget"
 fi
 
-./scripts/install-snakemake.sh
-./scripts/install-LDAK.sh
+command -v ./snakemake/.venv/bin/snakemake >/dev/null 2>&1 || ./scripts/install-snakemake.sh
+command -v ./ldak5.linux >/dev/null 2>&1 || ./scripts/install-LDAK.sh
 command -v plink >/dev/null 2>&1 || ./scripts/install-plink.sh
 
