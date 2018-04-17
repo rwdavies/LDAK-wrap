@@ -188,6 +188,8 @@ def main():
                 '--jobs', str(options.jobs),
                 options.target
             ]
+            ## '--immediate-submit', '--notemp',                            
+            
 
         try:
             print(subprocess.check_output(command, env=my_env).decode("utf-8"))

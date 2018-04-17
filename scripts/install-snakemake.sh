@@ -19,10 +19,9 @@ then
     echo remove existing snakemake
     rm -r -f snakemake
     echo download
-    ${WGET_OR_CURL} https://bitbucket.org/snakemake/snakemake/get/v4.8.0.tar.gz
-    tar -xzvf v4.8.0.tar.gz
-    mv snakemake-snakemake-e0c4734235c5 snakemake
+    git clone https://bitbucket.org/snakemake/snakemake.git
     cd snakemake
+    git reset --hard 7b489e1
     virtualenv.py -p python3 .venv
     source .venv/bin/activate
     python setup.py install
