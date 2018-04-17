@@ -3,7 +3,7 @@ python:
   - "3.5"
 
 script:
-  - echo hello
+  - ./scripts/all-tests.sh
 
 os:
   - linux
