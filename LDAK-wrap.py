@@ -193,6 +193,7 @@ def main():
             print(subprocess.check_output(command, env=my_env).decode("utf-8"))
         except subprocess.CalledProcessError as e:
             print(e.output.decode('utf-8'))
+            sys.exit("Failed LDAK-wrap")
         print("Done LDAK-wrap")
 
 if __name__ == '__main__':
