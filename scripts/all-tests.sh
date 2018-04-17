@@ -9,5 +9,6 @@ cd "${script_dir}/../"
 
 ./scripts/install.sh
 ./scripts/make-test-dataset.sh
+./LDAK-wrap.py -p test-results/testdata
 
 exit 0
