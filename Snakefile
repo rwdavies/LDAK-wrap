@@ -40,7 +40,7 @@ rule make_bed:
     output:
         bed = prefix + ".bed"
     shell:
-        'plink2 --file {prefix} --out {prefix} --make-bed '
+        'plink --file {prefix} --out {prefix} --make-bed '
 
 
 rule split_by_chr:
@@ -50,7 +50,7 @@ rule split_by_chr:
     output:
         bed = prefix + ".chr{chr}.bed"
     shell:
-        'plink2 --bfile {prefix} --chr {wildcards.chr} --out {prefix}.chr{wildcards.chr} --make-bed'
+        'plink --bfile {prefix} --chr {wildcards.chr} --out {prefix}.chr{wildcards.chr} --make-bed'
 
 
 ## step 1A

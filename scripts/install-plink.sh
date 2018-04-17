@@ -6,11 +6,11 @@ cd "${script_dir}"/../
 
 if [ "${USER_OS}" == "Darwin" ]
 then
-    ${WGET_OR_CURL} http://s3.amazonaws.com/plink2-assets/plink2_mac_20180416.zip
-    unzip -o plink2_mac_20180416.zip
+    ${WGET_OR_CURL} https://www.cog-genomics.org/static/bin/plink180410/plink_mac.zip
+    unzip -o plink_mac.zip
 else
-    ${WGET_OR_CURL} http://s3.amazonaws.com/plink2-assets/plink2_linux_x86_64_20180416.zip
-    unzip -o plink2_linux_x86_64_20180416.zip
+    ${WGET_OR_CURL} https://www.cog-genomics.org/static/bin/plink180410/plink_linux_x86_64.zip
+    unzip -o plink_linux_x86_64.zip
 fi
 
 
