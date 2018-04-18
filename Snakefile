@@ -19,9 +19,11 @@ rule all:
     input:
         [
         workingdir + "/result/pheno1.coeff",
-        workingdir + "/partitions/kinships.all.vect.png",
         workingdir + "/partitions/pca.loads.load"	
 	]
+
+##        workingdir + "/partitions/kinships.all.vect.png",
+
 
 rule step2:
     input:
@@ -31,7 +33,9 @@ rule step1:
     input:
         workingdir + "/sections/weights.all"
 
-#expand(prefix + ".chr{chr}.bed", chr = chromosomes)
+rule split_chr:
+    input:
+        expand(prefix + ".chr{chr}.bed", chr = chromosomes)
 
 rule make_bed:
     params: N = "make_bed"
@@ -40,7 +44,7 @@ rule make_bed:
     output:
         bed = prefix + ".bed"
     shell:
-        'plink --file {prefix} --out {prefix} --make-bed '
+        'plink --file {prefix} --out {prefix} --make-bed &> {output}.log'
 
 
 rule split_by_chr:
@@ -50,7 +54,7 @@ rule split_by_chr:
     output:
         bed = prefix + ".chr{chr}.bed"
     shell:
-        'plink --bfile {prefix} --chr {wildcards.chr} --out {prefix}.chr{wildcards.chr} --make-bed'
+        'plink --bfile {prefix} --chr {wildcards.chr} --out {prefix}.chr{wildcards.chr} --make-bed  &> {output}.log'
 
 
 ## step 1A
@@ -63,6 +67,7 @@ rule get_sections_by_chr:
     shell:
         '{LDAK} --bfile {prefix}.chr{wildcards.chr} '
         '--cut-weights {workingdir}/sections/chr{wildcards.chr}'
+        ' &> {output}.log'
 
 
 ## step 1B, part 1. since LDAK makes intedeterminate number of files, need to be clever
@@ -70,16 +75,18 @@ rule get_sections_by_chr:
 rule prepare_to_make_weights_by_chr:
     params: N = "prepare_to_make_weights_by_chr"
     input:
-        workingdir + "/sections/chr{chr}/section.number"
+        expand("{w}/sections/chr{chr}/section.number", w = workingdir, chr = chromosomes)
     output:
-        dynamic(workingdir + "/sections/chr{chr}/to_run{weight}")
+        dynamic(expand("{w}/sections/chr{chr}/to_run{{weight}}", w = workingdir, chr = chromosomes))
     run:
-        with open(input[0], 'r') as infile:
-            n_to_make = int(infile.readlines()[0])
-            for i in range(1, n_to_make + 1):
-                out_file = workingdir + "/sections/chr" + str(wildcards.chr) + "/to_run" + str(i)
-                with open(out_file, 'w+') as outfile:
-                    outfile.write("1")
+        for chr in chromosomes:
+            file = workingdir + "/sections/chr" + str(chr) + "/section.number"
+            with open(file, 'r') as infile:
+                n_to_make = int(infile.readlines()[0])
+                for i in range(1, n_to_make + 1):
+                    out_file = workingdir + "/sections/chr" + str(chr) + "/to_run" + str(i)
+                    with open(out_file, 'w+') as outfile:
+                        outfile.write("1")
 
 ## step 1B - make weights per chromosome region
 rule make_weights_by_chr:
@@ -92,7 +99,7 @@ rule make_weights_by_chr:
     shell:
         '{LDAK} --bfile {prefix}.chr{wildcards.chr} '
         '--calc-weights {workingdir}/sections/chr{wildcards.chr} '
-        '--section {wildcards.weight} && touch {output}'
+        '--section {wildcards.weight} &> {output}.log && touch {output}'
 
 ## step1C - merge weights within chromosome together
 rule join_weights_by_chr:
@@ -105,6 +112,7 @@ rule join_weights_by_chr:
     shell:
         '{LDAK} --bfile {prefix}.chr{wildcards.chr} '
         '--join-weights {workingdir}/sections/chr{wildcards.chr}'
+        ' &> {output}.log'	
 
 ## step1D - merge weights per chromosome together
 rule join_weights:
@@ -114,11 +122,11 @@ rule join_weights:
     output:
         workingdir + "/sections/weights.all"
     shell:
-        'head -n1 {input[0]} > {output} && '
+        '(head -n1 {input[0]} > {output} && '
         'for chr in {chromosomes}; '
         'do echo $chr; '
         'sed 1d {workingdir}/sections/chr${{chr}}/weights.all >> {output} ;'
-        'done'
+        'done) &> {output}.log'
 
 ## stpe2A prepare kinship calculations
 rule make_partitions:
@@ -129,6 +137,7 @@ rule make_partitions:
         workingdir + "/partitions/partition.details"
     shell:
         '{LDAK} --bfile {prefix} --cut-kins {workingdir}/partitions --by-chr YES'
+        ' &> {output}.log'	
 
 ## step2B calculate kinships
 rule calculate_kinships:
@@ -145,6 +154,7 @@ rule calculate_kinships:
         '--partition {wildcards.chr} '
         '--weights {workingdir}/sections/weights.all '
         '--power {LDAK_POWER}'
+        ' &> {output}.log'	
 
 ## to ignore weights
 ##  --ignore-weights YES
@@ -158,6 +168,7 @@ rule join_kinships:
         workingdir + "/partitions/kinships.all.grm.bin"
     shell:
         '{LDAK} --bfile {prefix} --join-kins {workingdir}/partitions '
+        ' &> {output}.log'	
 
 ## Optional: this is to produce PCs
 rule run_pca:
@@ -171,6 +182,7 @@ rule run_pca:
         '--grm {workingdir}/partitions/kinships.all '
         '--pca {workingdir}/partitions/kinships.all '	
         '--axes 20'
+        ' &> {output}.log'	
 
 rule plot_pca:
     params: N = "run_pca"
@@ -182,13 +194,15 @@ rule plot_pca:
         '{R_DIR}/plot-pca.R --slave --args '
         '{input} '
         '{output} '
+        ' &> {output}.log'	
 
 ## Optional: generate loadings
 rule calc_pca_loads:
     params: N = "calc_pca_loads"
     input:
         workingdir + "/partitions/kinships.all.grm.bin",
-        prefix + ".bed"
+        prefix + ".bed",
+        workingdir + "/partitions/kinships.all.vect"	
     output:
         workingdir + "/partitions/pca.loads.load"
     shell:
@@ -197,6 +211,7 @@ rule calc_pca_loads:
         '--bfile {prefix} '
         '--pcastem {workingdir}/partitions/kinships.all '
         '--calc-pca-loads {workingdir}/partitions/pca.loads '
+        ' &> {output}.log'	
 
 ## Optional: generate loadings
 ## rule plot_pca_loads:
@@ -226,3 +241,4 @@ rule estimate_h2:
         '--mpheno 1 '
         '--grm {workingdir}/partitions/kinships.all '
         '--reml {workingdir}/result/pheno1'
+        ' &> {output}.log'	
