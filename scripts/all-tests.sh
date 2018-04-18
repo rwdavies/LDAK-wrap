@@ -8,7 +8,10 @@ script_dir=`dirname "$0"`
 cd "${script_dir}/../"
 
 ./scripts/install.sh
+rm -r -f test-results
 ./scripts/make-test-dataset.sh
-./LDAK-wrap.py -p test-results/testdata
+rm -r -f LDAKoutput
+./LDAK-wrap.py -p test-results/testdata -t split_chr
+./LDAK-wrap.py -p test-results/testdata -t all
 
 exit 0
